@@ -146,6 +146,10 @@ def main(config_path):
         HTTP_GET_HEADERS_BASIC_AUTH.update({'Authorization': 'Basic {0}'.format(GRAFANA_BASIC_AUTH)})
         HTTP_POST_HEADERS_BASIC_AUTH = HTTP_POST_HEADERS.copy()
         HTTP_POST_HEADERS_BASIC_AUTH.update({'Authorization': 'Basic {0}'.format(GRAFANA_BASIC_AUTH)})
+        if not HTTP_GET_HEADERS:
+            config_dict['HTTP_GET_HEADERS'] = HTTP_GET_HEADERS_BASIC_AUTH
+        if not HTTP_POST_HEADERS:
+            config_dict['HTTP_POST_HEADERS'] = HTTP_GET_HEADERS_BASIC_AUTH
     else:
         HTTP_GET_HEADERS_BASIC_AUTH = None
         HTTP_POST_HEADERS_BASIC_AUTH = None
@@ -163,8 +167,6 @@ def main(config_path):
     config_dict['PRETTY_PRINT'] = PRETTY_PRINT
     config_dict['UID_DASHBOARD_SLUG_SUFFIX'] = UID_DASHBOARD_SLUG_SUFFIX
     config_dict['EXTRA_HEADERS'] = EXTRA_HEADERS
-    config_dict['HTTP_GET_HEADERS'] = HTTP_GET_HEADERS
-    config_dict['HTTP_POST_HEADERS'] = HTTP_POST_HEADERS
     config_dict['HTTP_GET_HEADERS_BASIC_AUTH'] = HTTP_GET_HEADERS_BASIC_AUTH
     config_dict['HTTP_POST_HEADERS_BASIC_AUTH'] = HTTP_POST_HEADERS_BASIC_AUTH
     config_dict['TIMESTAMP'] = TIMESTAMP
