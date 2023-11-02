@@ -2,17 +2,31 @@ from google import api_core
 import io
 from google.cloud import storage
 
+def get_latest_file(bucket, prefix=''):
+    # List objects in the bucket with the specified prefix
+    blobs = bucket.list_blobs(prefix=prefix)
+
+    # Get the latest file based on the last modification time
+    latest_blob = None
+    for blob in blobs:
+        if not latest_blob or blob.updated > latest_blob.updated:
+            latest_blob = blob
+
+    return latest_blob
 
 def main(args, settings):
     arg_archive_file = args.get('<archive_file>', None)
 
     bucket_name = settings.get('GCS_BUCKET_NAME')
-
+    gcs_backup_dir = settings.get('GCS_BACKUP_DIR')
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
-
-    blob = bucket.blob(arg_archive_file)
-
+    if arg_archive_file.lower() == "latest":
+        blob = get_latest_file(bucket, gcs_backup_dir)
+    else:
+        if gcs_backup_dir:
+            arg_archive_file = '{0}/{1}'.format(gcs_backup_dir, arg_archive_file)
+        blob = bucket.blob(arg_archive_file)
     try:
         gcs_data = io.BytesIO(blob.download_as_bytes())
         print("Download from GCS: '{0}' was successful".format(bucket_name))
