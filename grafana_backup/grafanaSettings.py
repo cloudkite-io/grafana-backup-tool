@@ -43,6 +43,7 @@ def main(config_path):
     # Cloud storage settings - GCP
     gcp_config = config.get('gcp', {})
     gcs_bucket_name = gcp_config.get('gcs_bucket_name', '')
+    gcs_backup_dir = gcp_config.get('gcs_backup_dir', '')
     google_application_credentials = gcp_config.get('google_application_credentials', '')
 
     influxdb_measurement = config.get('influxdb', {}).get('measurement', 'grafana_backup')
@@ -72,6 +73,7 @@ def main(config_path):
     AZURE_STORAGE_CONNECTION_STRING = os.getenv('AZURE_STORAGE_CONNECTION_STRING', azure_storage_connection_string)
 
     GCS_BUCKET_NAME = os.getenv('GCS_BUCKET_NAME', gcs_bucket_name)
+    GCS_BACKUP_DIR = os.getenv('GCS_BACKUP_DIR', gcs_backup_dir)
     if not os.getenv('GOOGLE_APPLICATION_CREDENTIALS') and google_application_credentials:
         os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = google_application_credentials
 
@@ -148,8 +150,8 @@ def main(config_path):
         HTTP_POST_HEADERS_BASIC_AUTH.update({'Authorization': 'Basic {0}'.format(GRAFANA_BASIC_AUTH)})
         if not HTTP_GET_HEADERS:
             config_dict['HTTP_GET_HEADERS'] = HTTP_GET_HEADERS_BASIC_AUTH
-        if not HTTP_POST_HEADERS:
-            config_dict['HTTP_POST_HEADERS'] = HTTP_GET_HEADERS_BASIC_AUTH
+        if len(HTTP_POST_HEADERS.keys()) == 1:
+            config_dict['HTTP_POST_HEADERS'] = {**HTTP_POST_HEADERS, **HTTP_GET_HEADERS_BASIC_AUTH}
     else:
         HTTP_GET_HEADERS_BASIC_AUTH = None
         HTTP_POST_HEADERS_BASIC_AUTH = None
@@ -179,6 +181,7 @@ def main(config_path):
     config_dict['AZURE_STORAGE_CONTAINER_NAME'] = AZURE_STORAGE_CONTAINER_NAME
     config_dict['AZURE_STORAGE_CONNECTION_STRING'] = AZURE_STORAGE_CONNECTION_STRING
     config_dict['GCS_BUCKET_NAME'] = GCS_BUCKET_NAME
+    config_dict['GCS_BACKUP_DIR'] = GCS_BACKUP_DIR
     config_dict['INFLUXDB_MEASUREMENT'] = INFLUXDB_MEASUREMENT
     config_dict['INFLUXDB_HOST'] = INFLUXDB_HOST
     config_dict['INFLUXDB_PORT'] = INFLUXDB_PORT

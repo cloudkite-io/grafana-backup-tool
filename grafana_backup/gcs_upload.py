@@ -5,12 +5,17 @@ from google.cloud import storage
 def main(args, settings):
     bucket_name = settings.get('GCS_BUCKET_NAME')
     backup_dir = settings.get('BACKUP_DIR')
+    gcs_backup_dir = settings.get('GCS_BACKUP_DIR')
     timestamp = settings.get('TIMESTAMP')
 
     storage_client = storage.Client()
 
-    gcs_file_name = '{0}.tar.gz'.format(timestamp)
-    archive_file = '{0}/{1}'.format(backup_dir, gcs_file_name)
+    file_name = '{0}.tar.gz'.format(timestamp)
+    archive_file = '{0}/{1}'.format(backup_dir, file_name)
+    if gcs_backup_dir:
+        gcs_file_name = '{0}/{1}'.format(gcs_backup_dir, file_name)
+    else:
+        gcs_file_name = file_name
 
     try:
         bucket = storage_client.bucket(bucket_name)
