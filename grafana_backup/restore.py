@@ -83,22 +83,29 @@ def main(args, settings):
     restore_functions = collections.OrderedDict()
     # Folders must be restored before Library-Elements
     restore_functions['folder'] = create_folder
-    restore_functions['datasource'] = create_datasource
+    
+    # Disable restoration of datasources since these are loaded from file
+    # The backups lack sensitive data like HTTP headers which are required to pull data
+    # restore_functions['datasource'] = create_datasource
+
     # Library-Elements must be restored before dashboards
     restore_functions['library_element'] = create_library_element
     restore_functions['dashboard'] = create_dashboard
     restore_functions['alert_channel'] = create_alert_channel
     restore_functions['organization'] = create_org
-    restore_functions['user'] = create_user
+    # Disable restoration of users due to error when Google users 
+    # attempt to login again after restoration
+    # restore_functions['user'] = create_user
     restore_functions['snapshot'] = create_snapshot
     restore_functions['annotation'] = create_annotation
     restore_functions['team'] = create_team
     restore_functions['team_member'] = create_team_member
     restore_functions['folder_permission'] = update_folder_permissions
     restore_functions['alert_rule'] = create_alert_rule
-    restore_functions['contact_point'] = create_contact_point
+    # Disable restoration of contact points since sensitive data such as webhook URL is redacted
+    # restore_functions['contact_point'] = create_contact_point
     # There are some issues of notification policy restore api, it will lock the notification policy page and cannot be edited.
-    # restore_functions['notification_policys'] = update_notification_policy
+    restore_functions['notification_policys'] = update_notification_policy
 
     if sys.version_info >= (3,):
         with tempfile.TemporaryDirectory() as tmpdir:
